@@ -1,0 +1,33 @@
+/* Modal fade + scale animation */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-enter {
+  animation: modalFadeIn 0.25s ease-out forwards;
+}
+.modal-exit {
+  animation: modalFadeIn 0.25s ease-in reverse forwards;
+}
+/* Modal backdrop fade animation */
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.backdrop-enter {
+  animation: backdropFadeIn 0.25s ease-out forwards;
+}
+.backdrop-exit {
+  animation: backdropFadeIn 0.25s ease-in reverse forwards;
+}
