@@ -26,6 +26,11 @@ export const SummaryTable = ({ rows, depthUnit = "m" }) => {
       ? ((maxRow.input.TotalGas / totalGasSum) * 100).toFixed(2)
       : "0.00";
 
+  // Background gas range
+  const totalGases = rows.map((r) => Number(r.input.TotalGas));
+  const bgMin = totalGases.length ? Math.min(...totalGases) : 0;
+  const bgMax = totalGases.length ? Math.max(...totalGases) : 0;
+
   return (
     <div>
       <table
@@ -74,6 +79,10 @@ export const SummaryTable = ({ rows, depthUnit = "m" }) => {
           </tr>
         </tbody>
       </table>
+      <div style={{ fontSize: "13px", marginBottom: "8px", color: "#1976d2" }}>
+        <b>Background Gas Range:</b> {bgMin.toFixed(2)} - {bgMax.toFixed(2)}{" "}
+        (unit)
+      </div>
     </div>
   );
 };
