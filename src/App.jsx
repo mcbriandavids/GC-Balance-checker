@@ -151,48 +151,56 @@ export const App = () => {
     if (!pasteText) return;
 
     const parsed = parseTextToRows(pasteText);
+    // Validation: check for required fields and numeric values
+    const requiredFields = HEADERS;
+    const errors = [];
+    parsed.forEach((row, idx) => {
+      requiredFields.forEach((field) => {
+        if (row[field] === undefined || row[field] === "") {
+          errors.push(`Row ${idx + 1}: Missing value for ${field}`);
+        } else if (field !== "Depth" && isNaN(Number(row[field]))) {
+          errors.push(`Row ${idx + 1}: ${field} is not a valid number`);
+        }
+      });
+    });
+    if (errors.length > 0) {
+      showNotification(`❌ Data Error: ${errors[0]}`, "error");
+      return;
+    }
     if (parsed.length === 0) {
+      showNotification("❌ No valid rows detected.", "error");
       setPasteText("");
       setModal(null);
       return;
     }
 
-    const firstPastedDepth = Number(parsed[0].Depth || 0);
-    const lastExistingDepth =
-      rows.length > 0 ? Number(rows[rows.length - 1].input.Depth || 0) : null;
-
-    if (lastExistingDepth !== null && firstPastedDepth <= lastExistingDepth) {
-      const filtered = parsed.filter(
-        (r) => Number(r.Depth || 0) > lastExistingDepth
+    // Filter out any pasted rows with depths already present
+    const existingDepths = new Set(rows.map((r) => Number(r.input.Depth)));
+    const filtered = parsed.filter((r) => !existingDepths.has(Number(r.Depth)));
+    if (filtered.length === 0) {
+      showNotification(
+        "ℹ️ All pasted depths already exist. No new rows added.",
+        "info"
       );
-      if (filtered.length === 0) {
-        showNotification(
-          "ℹ️ Depth Pasted Already, only new depths will be appended.",
-          "info"
-        );
-        setPasteText("");
-        setModal(null);
-        return;
-      }
-      setModal({
-        type: "confirm",
-        message:
-          "⚠️ The pasted data contains existing depths. Append only new depths?",
-        onConfirm: () => {
-          addRowsFromParsed(filtered);
-          setModal(null);
-          setPasteText("");
-        },
-        onCancel: () => {
-          setModal(null);
-          setPasteText("");
-        },
-      });
-    } else {
-      addRowsFromParsed(parsed);
-      setModal(null);
       setPasteText("");
+      setModal(null);
+      return;
     }
+    setModal({
+      type: "confirm",
+      message: `⚠️ ${
+        parsed.length - filtered.length
+      } depths already exist. Append only new depths?`,
+      onConfirm: () => {
+        addRowsFromParsed(filtered);
+        setModal(null);
+        setPasteText("");
+      },
+      onCancel: () => {
+        setModal(null);
+        setPasteText("");
+      },
+    });
   };
 
   const normalizeRow = (id) => {

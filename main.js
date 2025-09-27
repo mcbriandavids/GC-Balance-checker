@@ -17,7 +17,7 @@ function createWindow() {
     width: 1200,
     height: 800,
     title: "", // Blank window title
-    icon: path.join(__dirname, "public", "blank.ico"), // Placeholder icon, replace later
+    // icon property removed
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
