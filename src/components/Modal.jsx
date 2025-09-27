@@ -70,11 +70,7 @@ export const Modal = ({
             >
               ×
             </span>
-            <img
-              src="/vite.svg"
-              alt="App Logo"
-              style={{ width: 60, marginBottom: 12 }}
-            />
+            {/* App logo removed as per user request */}
             <h2 style={{ color: "#1976d2", marginBottom: 8 }}>
               About GC Balance Checker
             </h2>

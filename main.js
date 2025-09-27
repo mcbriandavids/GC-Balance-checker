@@ -16,12 +16,17 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    title: "", // Blank window title
+    icon: path.join(__dirname, "public", "blank.ico"), // Placeholder icon, replace later
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, "preload.js"),
     },
+    autoHideMenuBar: true,
   });
+  // Remove default menu (File, Edit, View, etc)
+  mainWindow.setMenu(null);
 
   // ✅ Use VITE_DEV_SERVER_URL in dev, otherwise load dist/index.html
 

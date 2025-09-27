@@ -1,6 +1,6 @@
 import { COMPONENT_KEYS } from "../utils/constants";
 
-export const SummaryTable = ({ rows }) => {
+export const SummaryTable = ({ rows, depthUnit = "m" }) => {
   if (!rows.length) return null;
 
   // Find max gas and its depth
@@ -8,6 +8,14 @@ export const SummaryTable = ({ rows }) => {
     (max, r) => (r.input.TotalGas > max.input.TotalGas ? r : max),
     rows[0]
   );
+
+  // Convert depth if needed
+  const getDepth = (depth) => {
+    if (depthUnit === "ft") {
+      return (Number(depth) * 3.28084).toFixed(2);
+    }
+    return Number(depth).toFixed(2);
+  };
 
   return (
     <table
@@ -21,9 +29,7 @@ export const SummaryTable = ({ rows }) => {
     >
       <thead>
         <tr>
-          <th style={{ border: "1px solid #ccc", padding: "4px" }}>
-            Max Depth
-          </th>
+          <th style={{ border: "1px solid #ccc", padding: "4px" }}>Depth</th>
           <th style={{ border: "1px solid #ccc", padding: "4px" }}>
             Max Gas (u)
           </th>
@@ -40,7 +46,7 @@ export const SummaryTable = ({ rows }) => {
       <tbody>
         <tr>
           <td style={{ border: "1px solid #ccc", padding: "4px" }}>
-            {maxRow.input.Depth}
+            {getDepth(maxRow.input.Depth)} {depthUnit}
           </td>
           <td style={{ border: "1px solid #ccc", padding: "4px" }}>
             {maxRow.input.TotalGas.toFixed(2)}

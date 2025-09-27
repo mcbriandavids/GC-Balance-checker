@@ -2,8 +2,9 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { COMPONENT_KEYS } from "./constants.js";
 
-export const exportCsv = (rows, minMax, depthUnit = "m") => {
-  if (!rows.length) return;
+// Export to Excel, optionally to a specific filePath (Electron)
+export const exportCsv = (rows, minMax, depthUnit = "m", filePath) => {
+  if (!rows.length) return Promise.reject();
 
   // Sort rows by Depth
   const sortedRows = [...rows].sort(
@@ -43,8 +44,20 @@ export const exportCsv = (rows, minMax, depthUnit = "m") => {
   XLSX.utils.book_append_sheet(wb, ws, "Data");
 
   const wbout = XLSX.write(wb, { type: "array", bookType: "xlsx" });
+
+  // If Electron and filePath provided, use fs to write file
+  if (filePath && window && window.electron && window.electron.writeFile) {
+    return window.electron
+      .writeFile(filePath, wbout)
+      .then(() => true)
+      .catch((err) => {
+        throw err;
+      });
+  }
+  // Fallback: browser download
   saveAs(
     new Blob([wbout], { type: "application/octet-stream" }),
     "gc_data.xlsx"
   );
+  return Promise.resolve();
 };

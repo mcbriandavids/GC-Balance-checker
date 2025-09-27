@@ -1,7 +1,29 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const _require = typeof require !== "undefined" ? require : eval("require");
+const { contextBridge, ipcRenderer, shell } = _require("electron");
+const fs = _require("fs");
+const os = _require("os");
+const path = _require("path");
+// Buffer is global in Node.js/Electron
 
 contextBridge.exposeInMainWorld("electron", {
   exitApp: () => ipcRenderer.send("exitApp"),
+  // Write file to disk (buffer)
+  writeFile: (filePath, buffer) => {
+    return new Promise((resolve, reject) => {
+      fs.writeFile(filePath, globalThis.Buffer.from(buffer), (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+  // Get Desktop path
+  getDesktopPath: () => {
+    return os.homedir() ? path.join(os.homedir(), "Desktop") : "";
+  },
+  // Open file (Excel)
+  openFile: (filePath) => {
+    shell.openPath(filePath);
+  },
 });
 
 // Now you can use window.electron.exitApp() in your renderer process to send the exitApp message.
